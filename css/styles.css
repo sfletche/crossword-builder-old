@@ -1,0 +1,12 @@
+.cw-grid {
+  margin: 20px;
+  font-size: 0;
+}
+
+.cw-grid input {
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  font-size: 14px;
+  text-transform: uppercase;
+}

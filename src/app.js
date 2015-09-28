@@ -114,6 +114,13 @@ function backgroundIsBlack(element) {
 function restoreBackground(activeBox) {
   var element = document.getElementById(activeBox.id);
   element.style.background = 'white';
+  restoreOpposingSquare(element);
+}
+
+function restoreOpposingSquare(element) {
+  var id = getOpposingId(element.id);
+  var element = document.getElementById(id);
+  element.style.background = 'white';
 }
 
 function getNextBox(activeBox) {

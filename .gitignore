@@ -1,3 +1,6 @@
 dist/*
 lib/*
+persist/*
 node_modules/*
+
+words.txt

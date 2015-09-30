@@ -2,9 +2,10 @@
   "name": "crossword-builder",
   "version": "0.0.1",
   "dependencies": {
-      "gulp": "3.9.0",
-      "gulp-watch": "4.3.5",
-      "gulp-babel": "5.2.1",
-      "gulp-plumber": "1.0.1"
+    "gulp": "3.9.0",
+    "gulp-babel": "5.2.1",
+    "gulp-plumber": "1.0.1",
+    "gulp-watch": "4.3.5",
+    "node-persist": "0.0.6"
   }
 }

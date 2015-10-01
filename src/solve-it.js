@@ -34,7 +34,7 @@ function findNextOpenSquare(currentCell) {
   }
   var adjacentCell = getAdjacentCell(currentCell);
   if (!isEmpty(adjacentCell)) {
-    findNextOpenSquare(adjacentCell);
+    return findNextOpenSquare(adjacentCell);
   } else {
     return adjacentCell;
   }
@@ -70,10 +70,10 @@ function start(cell) {
   if (!nextCell) {
     console.log('fini');
   }
-  if (!isEmpty(cell)) {
+  if (!isEmpty(nextCell)) {
     start(nextCell);
   }
-  if (populate(cell)) {
+  if (populate(nextCell)) {
     start(nextCell);
   } else {
     console.log('back up...');
@@ -103,7 +103,7 @@ function fetchGrid() {
 }
 
 function solveIt() {
-  var origin = 'cw-1-1';
+  var origin = 'cw-1-0';
   console.log('finding solution...');
   start(origin);
 }

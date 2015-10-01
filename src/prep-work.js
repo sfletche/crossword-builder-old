@@ -1,8 +1,11 @@
 var MAX_WORD_LENGTH = 3;
-var dictionary = undefined;
+// var dictionary = undefined;
 var storage = require('node-persist');
 var fs = require('fs'),
+    gfs = require('graceful-fs'),
     readline = require('readline');
+
+gfs.gracefulify(fs);
 
 var rd = readline.createInterface({
     input: fs.createReadStream('words.txt'),
@@ -33,7 +36,7 @@ function addToDictionary(word) {
   }
 }
 
-(function buildDictionary() {
+function buildDictionary() {
   // initializeDictionary();
   storage.initSync();
   rd.on('line', function(word) {
@@ -44,4 +47,10 @@ function addToDictionary(word) {
     var out = storage.getItem('3-2-b');
     console.log(out);
   });
-})();
+};
+
+module.exports = {
+  MAX_WORD_LENGTH: MAX_WORD_LENGTH,
+  storage: storage,
+  buildDictionary: buildDictionary
+};

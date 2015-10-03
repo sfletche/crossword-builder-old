@@ -14,6 +14,7 @@ function isValidCell(cell) {
 var originalCell = undefined;
 
 function getAdjacentCell(cell) {
+  console.log(cell);
   var [cw,row,col] = cell.split('-');
   row = parseInt(row,10);
   col = parseInt(col,10);
@@ -40,38 +41,131 @@ function findNextOpenSquare(currentCell) {
   }
 }
 
-function addWordAcross(cell) {
-
+function getCellAbove(cell) {
+  var [cw,row,col] = cell.split('-');
+  return [cw, row-1, col].join('-');
 }
 
-function addwordDown(cell) {
+function getCellBelow(cell) {
+  var [cw,row,col] = cell.split('-');
+  return [cw, row+1, col].join('-');
+}
 
+function getCellToLeft(cell) {
+  var [cw,row,col] = cell.split('-');
+  return [cw, row, col-1].join('-');
+}
+
+function getCellToRight(cell) {
+  var [cw,row,col] = cell.split('-');
+  return [cw, row, col+1].join('-');
+}
+
+function isBlankOrWall(cell) {
+  return !isValidCell(cell) || isBlankCell(cell);
+}
+
+function isBlankCell(cell) {
+  return getContents(cell) === 'blank';
+}
+
+function nothingToMyLeft(cell) {
+  var [cw,row,col] = cell.split('-');
+  var cellToLeft = getCellToLeft(cell);
+  return isBlankOrWall(cellToLeft);
+}
+
+function firstCellOfAcross(cell) {
+  return nothingToMyLeft(cell);
+}
+
+function nothingAboveMe(cell) {
+  var [cw,row,col] = cell.split('-');
+  var cellAbove = getCellAbove(cell);
+  return !isValidCell(cellAbove) || isBlankCell(cellAbove);
+}
+
+function firstCellOfDown(cell) {
+  return nothingAboveMe(cell);
+}
+
+function startOfWord(cell) {
+  return firstCellOfDown(cell) || firstCellOfAcross(cell);
+}
+
+function addWordDown(cell) {
+  debugger;
+}
+
+function getCurrentStateAcross(cell) {
+  var cells = [];
+  var currentCell = cell;
+  while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
+    cells.push(getContents(currentCell));
+    currentCell = cell;
+  }
+  return cells;
+}
+
+function getPotentialWords(state) {
+  debugger;
+}
+
+function addWordAcross(cell) {
+  var currentState = getCurrentStateAcross(cell);
+  var potentialWords = getPotentialWords(currentState);
+
+  debugger;
+}
+
+var fullToMyRight = function (cell) {
+  var full = !isEmpty(cell);
+  function isFull(cell) {
+    if (isEmpty(cell)) {
+      return false;
+    } else if (isBlankOrWall(cell)) {
+      return full;
+    }
+    return full && isFull(getCellToRight(cell));
+  }
+  return full && isFull(getCellToRight(cell));
+}
+
+function alreadyFilled(cell) {
+  return fullToMyRight(cell) && fullBelow(cell);
+}
+
+function addWords(cell) {
+  debugger;
+  if (alreadyFilled(cell)) {
+    return true;
+  } else {
+    return addWordAcross(cell) && addWordDown(cell);
+  }
 }
 
 function populate(cell) {
   var potentialWords = [];
   var success = true;
 
-  // if (across(cell)) {
-  //   success = success && addWordAcross(cell);
-  // }
-  // if (down(cell)) {
-  //   success = success && addWordDown(cell);
-  // }
-  // return success;
+  if (startOfWord(cell)) {
+    success = success && addWords(cell);
+  }
+  return success;
+}
+
+function getContents(cell) {
+  return grid[cell];
 }
 
 function isEmpty(cell) {
-  return grid[cell] === '';
+  return getContents(cell) === '';
 }
 
 function start(cell) {
   var nextCell = findNextOpenSquare(cell);
   if (!nextCell) {
     console.log('fini');
-  }
-  if (!isEmpty(nextCell)) {
-    start(nextCell);
   }
   if (populate(nextCell)) {
     start(nextCell);
@@ -102,15 +196,14 @@ function fetchGrid() {
   }
 }
 
-function solveIt() {
-  var origin = 'cw-1-0';
-  console.log('finding solution...');
-  start(origin);
-}
-
 var grid = fetchGrid();
 
-(function setup() {
-  init.buildDictionary();
-  solveIt();
-})();
+// (function setup() {
+//   init.buildDictionary();
+//   solveIt();
+// })();
+
+module.exports = {
+  start: start,
+  fullToMyRight: fullToMyRight
+};

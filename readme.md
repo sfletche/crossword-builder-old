@@ -1,3 +1,7 @@
+Instructions
+Solve Puzzle: babel-node src/run.js
+Run Tests: npm test
+
 What's Next
 
 Create small, 3x3 or 4x4, example and build out auto-fill from 3 letter words

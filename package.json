@@ -9,5 +9,19 @@
     "gulp-watch": "4.3.5",
     "lodash-node": "^3.10.1",
     "node-persist": "0.0.6"
+  },
+  "devDependencies": {
+    "karma-babel-preprocessor": "^5.2.2",
+    "babel-jest": "*",
+    "jest-cli": "*"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
+    "testFileExtensions": ["js"],
+    "moduleFileExtensions": ["js", "json"],
+    "testDirectoryName": "spec"
   }
 }

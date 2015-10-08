@@ -8,24 +8,40 @@ var utility = require('./utility-functions.js'),
     isEmpty = utility.isEmpty,
     isValidCell = utility.isValidCell,
     getAdjacentCell = utility.getAdjacentCell,
-    getContents = getContents;
+    getContents = utility.getContents,
+    isOrigin = utility.isOrigin,
+    isBlankOrWall = utility.isBlankOrWall;
 // var ui = require('./app.js');
 
-var originalCell = undefined;
+// var originalCell = undefined;
 
-function findNextOpenSquare(currentCell) {
-  console.log('findNextOpenSquare');
-  console.log(currentCell);
-  if (originalCell && _.isEqual(originalCell, currentCell)) {
+// function findNextOpenSquare(currentCell) {
+//   console.log('findNextOpenSquare');
+//   console.log(currentCell);
+//   if (originalCell && _.isEqual(originalCell, currentCell)) {
+//     return;
+//   } else if (!originalCell) {
+//     originalCell = currentCell;
+//   }
+//   if (isEmpty(currentCell)) {
+//     return currentCell;
+//   } else {
+//     return findNextOpenSquare(getAdjacentCell(currentCell));
+//   }
+// }
+
+var inProcess = false;
+
+function findNextSquare(currentCell) {
+  var nextCell = currentCell;
+  if(inProcess && isOrigin(currentCell)) {
     return;
-  } else if (!originalCell) {
-    originalCell = currentCell;
   }
-  if (isEmpty(currentCell)) {
-    return currentCell;
-  } else {
-    return findNextOpenSquare(getAdjacentCell(currentCell));
+  inProcess = true;
+  while(isBlankOrWall(nextCell)) {
+    nextCell = getAdjacentCell(nextCell);
   }
+  return nextCell;
 }
 
 function addWordDown(cell) {
@@ -69,10 +85,14 @@ function addWords(cell) {
   console.log('addWords');
   console.log(cell);
   var success = true;
+  console.log('calling fullToMyRight');
   if (!fullToMyRight(cell)) {
+    console.log('not full to my right');
     success = success && addWordAcross(cell);
   }
+  console.log('calling fullBelow');
   if (!fullBelow(cell)) {
+    console.log('not full below');
     success = success && addWordDown(cell);
   }
   return success;
@@ -91,13 +111,21 @@ function populate(cell) {
   return success;
 }
 
+var loop = 1;
+
 function start(cell) {
-  var nextCell = findNextOpenSquare(cell);
-  if (!nextCell) {
+  // var nextCell = findNextOpenSquare(cell);
+  console.log('start');
+  console.log(cell);
+  if (!cell) {
     console.log('fini');
   }
   if (populate(cell)) {
-    start(nextCell);
+    loop += 1;
+    if (loop > 10) {
+      return
+    }
+    start(findNextSquare(cell));
   } else {
     console.log('back up...');
   }

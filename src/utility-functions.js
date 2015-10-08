@@ -3,14 +3,12 @@ const NUM_ROWS = 4;
 const NUM_COLS = 4;
 
 var isValidCell = function(cell) {
-  return cell &&
-         cell.row >= 0 && cell.row <= NUM_ROWS &&
-         cell.col >= 0 && coll.col <= NUM_COLS;
+  var [cw,row,col] = cell.split('-');
+  return row >= 0 && row <= NUM_ROWS &&
+         col >= 0 && col <= NUM_COLS;
 };
 
 var getAdjacentCell = function(cell) {
-  console.log('getAdjacentCell');
-  console.log(cell);
   var [cw,row,col] = cell.split('-');
   row = parseInt(row,10);
   col = parseInt(col,10);
@@ -25,8 +23,6 @@ var getAdjacentCell = function(cell) {
 
 
 var fullToMyRight = function (cell) {
-  console.log('fullToMyRight');
-  console.log(cell);
   var full = !isEmpty(cell);
   function isFull(cell) {
     if (isEmpty(cell)) {
@@ -41,7 +37,6 @@ var fullToMyRight = function (cell) {
 
 var fullBelow = function (cell) {
   console.log('fullBelow');
-  console.log(cell);
   var full = !isEmpty(cell);
   function isFull(cell) {
     if (isEmpty(cell)) {
@@ -51,14 +46,14 @@ var fullBelow = function (cell) {
     }
     return full && isFull(getCellBelow(cell));
   }
+  console.log(getCellBelow(cell));
   return full && isFull(getCellBelow(cell));
 };
 
 
 var startOfWord = function(cell) {
   console.log('startOfWord');
-  console.log('first cell of down: ' + firstCellOfDown(cell));
-  console.log('first cell of across: ' + firstCellOfAcross(cell));
+  console.log(cell);
   return firstCellOfDown(cell) || firstCellOfAcross(cell);
 };
 
@@ -72,6 +67,14 @@ var isEmpty = function(cell) {
 
 var getContents = function(cell) {
   return grid[cell];
+};
+
+var isOrigin = function(cell) {
+  return cell === 'cw-1-1';
+};
+
+var isBlankOrWall = function(cell) {
+  return !isValidCell(cell) || isBlankCell(cell);
 };
 
 
@@ -95,10 +98,6 @@ function firstCellOfAcross(cell) {
   return nothingToMyLeft(cell);
 }
 
-function isBlankOrWall(cell) {
-  return !isValidCell(cell) || isBlankCell(cell);
-}
-
 function getCellAbove(cell) {
   var [cw,row,col] = cell.split('-');
   return [cw, row-1, col].join('-');
@@ -106,12 +105,14 @@ function getCellAbove(cell) {
 
 function getCellToRight(cell) {
   var [cw,row,col] = cell.split('-');
-  return [cw, row, col+1].join('-');
+  col = parseInt(col, 10) + 1;
+  return [cw, row, col].join('-');
 }
 
 function getCellBelow(cell) {
   var [cw,row,col] = cell.split('-');
-  return [cw, row+1, col].join('-');
+  row = parseInt(row, 10) + 1;
+  return [cw, row, col].join('-');
 }
 
 function getCellToLeft(cell) {
@@ -152,5 +153,7 @@ module.exports = {
   isValidCell: isValidCell,
   isEmpty: isEmpty,
   getAdjacentCell: getAdjacentCell,
-  getContents: getContents
+  getContents: getContents,
+  isOrigin: isOrigin,
+  isBlankOrWall: isBlankOrWall
 };

@@ -1,7 +1,7 @@
 // original prototype http://codepen.io/anon/pen/GpNrmO
 
-const NUM_ROWS = 13;
-const NUM_COLS = 13;
+const NUM_ROWS = 4;
+const NUM_COLS = 4;
 
 var Crossword = React.createClass({
   render: function() {
@@ -20,6 +20,16 @@ var Crossword = React.createClass({
         {rows}
       </div>
     );
+  }
+});
+
+var Notepad = React.createClass({
+  render: function() {
+    return (
+      <div className='cw-notepad'>
+        <input id='notepad' type='text' />
+      </div>
+    )
   }
 });
 
@@ -193,3 +203,21 @@ function getNextBoxId(currentId) {
   row = row > NUM_ROWS-1 ? 0 : row;
   return [cw, row, col].join('-');
 }
+
+// module.exports = {
+//   fetchGrid: function() {
+//     var grid = {};
+//     for (var i=1; i<=NUM_ROWS; i++) {
+//       for (var j=1; j<= NUM_COLS; j++) {
+//         let id = `cw-${r}-${c}`;
+//         let element = document.getElementById(activeBox.id);
+//         if (backgroundIsBlack(element)) {
+//           grid[id] = 'blank';
+//         } else {
+//           grid[id] = element.value;
+//         }
+//       }
+//     }
+//     return grid;
+//   }
+// };

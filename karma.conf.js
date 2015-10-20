@@ -15,6 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'node_modules/babel-jest/node_modules/babel-core/browser-polyfill.js',
       'src/*.js',
       'spec/*-spec.js'
     ],
@@ -33,7 +34,8 @@ module.exports = function(config) {
     },
     babelPreprocessor: {
       options: {
-        sourceMap: 'inline'
+        sourceMap: 'inline',
+        stage: 2
       },
       filename: function (file) {
         return file.originalPath.replace(/\.js$/, '.es5.js');

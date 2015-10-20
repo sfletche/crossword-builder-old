@@ -4,6 +4,12 @@ Run Tests: npm test
 
 What's Next
 
+Current Problem...
+Testing Asynchronous code (async/await)
+jasmine-node and jasmine 2.0 both seem to have done() enabled, but it's not working for me
+I'm guessing this is related to jest...?
+Not sure how to use jasmine-node with babel without current jest setup...
+
 Create small, 3x3 or 4x4, example and build out auto-fill from 3 letter words
 
 Auto-fill

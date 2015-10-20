@@ -1,7 +1,7 @@
 import '../auto_mock_off';
 // import { fullToMyRight } from '../src/solve-it.js';
 
-describe('utility-functions', function() {
+xdescribe('utility-functions', function() {
   var subject = require('../src/utility-functions.js');
 
   describe('fullToMyRight', function() {

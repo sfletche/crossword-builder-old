@@ -1,6 +1,11 @@
 var MAX_WORD_LENGTH = 3;
 // var dictionary = undefined;
-var storage = require('node-persist');
+// var client = require('node-persist');
+
+// var redis = require("redis"),
+var promiseFactory = require("q").Promise,
+    redis = require('promise-redis')(promiseFactory),
+    client = redis.createClient();
 var fs = require('fs'),
     gfs = require('graceful-fs'),
     readline = require('readline');
@@ -14,7 +19,7 @@ var rd = readline.createInterface({
 });
 
 // function initializeDictionary() {
-//   storage.initSync();
+//   client.initSync();
 //   dictionary = {};
 //   for (var i=2; i<=MAX_WORD_LENGTH; i++) {
 //     dictionary[i] = {};
@@ -27,30 +32,33 @@ var rd = readline.createInterface({
 function addToDictionary(word) {
   var newWord = word.toLowerCase();
   for (var i=1, len = word.length; i<=len; i++) {
-    var filename = len + '-' + i + '-' + word[i-1];
-    var wordList = storage.getItem(filename) || [];
-    if (!wordList || wordList[wordList.length-1] !== newWord) {
-      wordList.push(newWord);
-    }
-    storage.setItem(filename, wordList);
+    var filename = 'cw:' + len + ':' + i + ':' + word[i-1];
+    // var wordList = client.get(filename) || [];
+    // if (!wordList || wordList[wordList.length-1] !== newWord) {
+    //   wordList.push(newWord);
+    // }
+    client.rpush(filename, newWord);
   }
 }
 
 function buildDictionary() {
   // initializeDictionary();
-  storage.initSync();
+  // client.initSync();
+  client.keys('cw:*', function(err, key) {
+    client.del(key);
+  });
   rd.on('line', function(word) {
     if (word.length > 1 && word.length <= MAX_WORD_LENGTH) {
       addToDictionary(word);
     }
   }).on('close', function() {
-    var out = storage.getItem('3-2-b');
-    console.log(out);
+    var out = client.get('cw:3:2:b');
+    // console.log(out);
   });
 };
 
 module.exports = {
   MAX_WORD_LENGTH: MAX_WORD_LENGTH,
-  storage: storage,
+  client: client,
   buildDictionary: buildDictionary
 };

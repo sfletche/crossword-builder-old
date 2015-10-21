@@ -23,7 +23,6 @@ var inProcess = false;
 
 function addWordDown(cell) {
   console.log(`addWordDown: ${cell}`);
-  debugger;
 }
 
 function getCurrentStateAcross(cell) {
@@ -57,17 +56,12 @@ function getWordLists(state) {
 }
 
 function getPotentialWords(state) {
-  console.log(`getPotentialWords: ${state}`);
   var wordLists = getWordLists(state);
-  console.log(`wordLists`);
-  console.log(wordLists);
   var words = _.intersection(...wordLists);
-  console.log(`words: ${words}`);
-  // return words;
+  return words;
 }
 
 function addWordAcross(cell) {
-  console.log(`addWordAcross: ${cell}`);
   var currentState = getCurrentStateAcross(cell);
   var potentialWords = getPotentialWords(currentState);
   console.log(`currentState: ${currentState}`);

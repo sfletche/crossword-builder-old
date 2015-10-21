@@ -1,8 +1,10 @@
-require("babel/polyfill");
 var _ = require('lodash-node');
 var prep = require('./prep-work.js'),
-    buildDictionary = prep.buildDictionary,
-    client = prep.client;
+    addToDictionary = prep.addToDictionary,
+    MAX_WORD_LENGTH = prep.MAX_WORD_LENGTH,
+    rd = prep.rd,
+    cwDict = prep.cwDict;
+
 var utility = require('./utility-functions.js'),
     fullToMyRight = utility.fullToMyRight,
     fullBelow = utility.fullBelow,
@@ -14,42 +16,13 @@ var utility = require('./utility-functions.js'),
     getCellToRight = utility.getCellToRight,
     getContents = utility.getContents,
     isOrigin = utility.isOrigin,
-    isBlankOrWall = utility.isBlankOrWall;
-// var ui = require('./app.js');
-
-// var originalCell = undefined;
-
-// function findNextOpenSquare(currentCell) {
-//   console.log('findNextOpenSquare');
-//   console.log(currentCell);
-//   if (originalCell && _.isEqual(originalCell, currentCell)) {
-//     return;
-//   } else if (!originalCell) {
-//     originalCell = currentCell;
-//   }
-//   if (isEmpty(currentCell)) {
-//     return currentCell;
-//   } else {
-//     return findNextOpenSquare(getAdjacentCell(currentCell));
-//   }
-// }
+    isBlankOrWall = utility.isBlankOrWall,
+    isLetter = utility.isLetter;
 
 var inProcess = false;
 
-function findNextSquare(currentCell) {
-  var nextCell = currentCell;
-  if(inProcess && isOrigin(currentCell)) {
-    return;
-  }
-  inProcess = true;
-  while(isBlankOrWall(nextCell)) {
-    nextCell = getAdjacentCell(nextCell);
-  }
-  return nextCell;
-}
-
 function addWordDown(cell) {
-  console.log('addWordDown');
+  console.log(`addWordDown: ${cell}`);
   debugger;
 }
 
@@ -64,167 +37,90 @@ function getCurrentStateAcross(cell) {
 }
 
 function compileWordLists(err, data) {
-  console.log('compileWordLists');
-  console.log(data);
-}
-
-function getQuote() {
-  var quote;
-
-  return new Promise(function(resolve, reject) {
-    // setTimeout(function() {
-    quote = 'success';
-    resolve(quote);
-    // }, 10);
-  });
-}
-
-
-async function testAsync(state) {
-  var key = 'cw:3:1:h';
-  // console.log('key: ' + key);
-  // return new Promise(function(resolve, reject) {
-  // var response = await client.get(key);
-  var quote = await getQuote();
-  console.log('quote in testAsync ' + quote);
-  return quote;
-}
-
-function testingTheTest() {
-  var quote = testAsync();
-  console.log('quote in testingTheTest ', quote);
-  return quote;
 }
 
 function getWordLists(state) {
-  console.log('getWordLists');
   var wordLists = [];
-  for (let i=0; i<state.length; i++) {
-    if (state[i] !== '') {
-      let key = 'cw:' + state.length + ':';
-      key += (parseInt(i, 10)+1) + ':';
-      key += state[i];
-      console.log('key: ' + key);
-      /***
-      NEXT STEPS
-      redis promise library
-      accumulate promises and return (with all?)
-      catching function will need to wait before proceeding...
-
-      ***/
-      client.lpop(key)
-        .then(console.log)
-        .catch(console.log);
+  for (let i=0, len = state.length; i<len; i++) {
+    let letter = state[i];
+    if (isLetter(letter)) {
+      wordLists.push(Array.from(cwDict[len][i+1][letter]));
+      // let key = 'cw:' + state.length + ':';
+      // key += (parseInt(i, 10)+1) + ':';
+      // key += state[i];
+      // client.lpop(key)
+      //   .then(console.log)
+      //   .catch(console.log);
     }
   }
   return wordLists;
 }
 
 function getPotentialWords(state) {
-  console.log('getPotentialWords');
+  console.log(`getPotentialWords: ${state}`);
   var wordLists = getWordLists(state);
+  console.log(`wordLists`);
   console.log(wordLists);
-  /***
-  NEXT STEPS
-  intersection will be run once promises are resolved
-  ***/
   var words = _.intersection(...wordLists);
-  return words;
+  console.log(`words: ${words}`);
+  // return words;
 }
 
 function addWordAcross(cell) {
-  console.log('addWordAcross');
+  console.log(`addWordAcross: ${cell}`);
   var currentState = getCurrentStateAcross(cell);
   var potentialWords = getPotentialWords(currentState);
-  /***
-  NEXT STEPS
-  adding new words will have to wait for promises in getWordList to resolve...
-  ***/
-  console.log(potentialWords);
+  console.log(`currentState: ${currentState}`);
+  console.log(`potentialWords: ${potentialWords}`);
 }
 
 function alreadyFilled(cell) {
-  console.log('alreadyFilled');
-  console.log('full to my right: ' + fullToMyRight(cell));
-  console.log('full below: ' + fullBelow(cell));
   return fullToMyRight(cell) && fullBelow(cell);
 }
 
 function addWords(cell) {
-  console.log('addWords');
-  console.log(cell);
-  var success = true;
-  console.log('calling fullToMyRight');
+  console.log(`addWords: ${cell}`);
   if (!fullToMyRight(cell)) {
-    console.log('not full to my right');
-    success = success && addWordAcross(cell);
+    addWordAcross(cell);
   }
-  /***
-  NEXT STEPS
-  across work will need to complete before down work is started
-  ***/
-  console.log('calling fullBelow');
-  if (!fullBelow(cell)) {
-    console.log('not full below');
-    success = success && addWordDown(cell);
-  }
-  return success;
-
+  // if (!fullBelow(cell)) {
+  //   addWordDown(cell);
+  // }
 }
 
-function populate(cell) {
-  console.log('populate');
-  console.log(cell);
-  var potentialWords = [];
-  var success = true;
-
-  /***
-  NEXT STEPS
-  addWords might return a promise...
-  populate could return a related promise...
-  ***/
+function findNextSquare(currentCell) {
+  // console.log(`isBlankOrWall(${currentCell}): ${isBlankOrWall(currentCell)}`);
+  while(isBlankOrWall(currentCell)) {
+    currentCell = getAdjacentCell(currentCell);
+  }
+  return currentCell;
+}
+var iterations = 0;
+function populate(cell='cw-1-1', success=true) {
+  if (!isValidCell(cell)) return success;
+  console.log(`populate...`);
+  console.log(`cell: ${cell}`);
+  console.log(`success: ${success}`);
+  console.log(`startOfWord: ${startOfWord(cell)}`);
   if (startOfWord(cell)) {
-    success = success && addWords(cell);
+    console.log(`calling addWords with ${cell}`);
+    addWords(cell);
   }
-  return success;
+  // console.log(`findNextSquare for ${cell} returns ${findNextSquare(cell)}`);
+  if (iterations++ < 4)
+    populate(findNextSquare(cell), success);
 }
 
-var loop = 1;
-
-function start(cell) {
-  // var nextCell = findNextOpenSquare(cell);
-  buildDictionary();
-  console.log('start');
-  console.log(cell);
-  if (!cell) {
-    console.log('fini');
-  }
-  /***
-  NEXT STEPS
-  populate returns promise
-  control flow (start or backup) is determined by outcome of promise
-  ***/
-  populate(cell)
-    .then(start(findNextSquare(cell)))
-  if (populate(cell)) {
-    loop += 1;
-    if (loop > 10) {
-      return
+var start = function(cell) {
+  rd.on('line', function(word) {
+    if (word.length > 1 && word.length <= MAX_WORD_LENGTH) {
+      addToDictionary(word);
     }
-    start(findNextSquare(cell));
-  } else {
-    console.log('back up...');
-  }
+  }).on('close', function() {
+    populate();
+  });
 }
-
-// (function setup() {
-//   init.buildDictionary();
-//   solveIt();
-// })();
 
 module.exports = {
-  start: start,
-  getWordLists: getWordLists,
-  testAsync: testAsync,
-  testingTheTest: testingTheTest
+  start
 };

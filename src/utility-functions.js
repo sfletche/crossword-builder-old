@@ -36,7 +36,6 @@ var fullToMyRight = function (cell) {
 };
 
 var fullBelow = function (cell) {
-  console.log('fullBelow');
   var full = !isEmpty(cell);
   function isFull(cell) {
     if (isEmpty(cell)) {
@@ -46,14 +45,11 @@ var fullBelow = function (cell) {
     }
     return full && isFull(getCellBelow(cell));
   }
-  console.log(getCellBelow(cell));
   return full && isFull(getCellBelow(cell));
 };
 
 
 var startOfWord = function(cell) {
-  console.log('startOfWord');
-  console.log(cell);
   return firstCellOfDown(cell) || firstCellOfAcross(cell);
 };
 
@@ -76,6 +72,10 @@ var isOrigin = function(cell) {
 var isBlankOrWall = function(cell) {
   return !isValidCell(cell) || isBlankCell(cell);
 };
+
+var isLetter = function(letter) {
+  return letter >= 'a' && letter <= 'z';
+}
 
 
 function nothingToMyLeft(cell) {
@@ -146,15 +146,16 @@ var grid = fetchGrid();
 
 
 module.exports = {
-  fullToMyRight: fullToMyRight,
-  fullBelow: fullBelow,
-  startOfWord: startOfWord,
-  isBlankCell: isBlankCell,
-  isValidCell: isValidCell,
-  isEmpty: isEmpty,
-  getAdjacentCell: getAdjacentCell,
-  getCellToRight: getCellToRight,
-  getContents: getContents,
-  isOrigin: isOrigin,
-  isBlankOrWall: isBlankOrWall
+  fullToMyRight,
+  fullBelow,
+  startOfWord,
+  isBlankCell,
+  isValidCell,
+  isEmpty,
+  getAdjacentCell,
+  getCellToRight,
+  getContents,
+  isOrigin,
+  isBlankOrWall,
+  isLetter
 };

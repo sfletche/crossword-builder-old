@@ -3,6 +3,9 @@ Solve Puzzle: babel-node src/run.js
 Run Tests: npm test
 
 What's Next
+remove promise-redis and redis from node_modules and from prep-work and solve-it
+change strategy to in-memory for now
+restart work on solving 4x4 (or 3x3) puzzle
 
 Current Problem...
 Testing Asynchronous code (async/await)

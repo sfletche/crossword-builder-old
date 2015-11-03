@@ -6,6 +6,7 @@ var prep = require('./prep-work.js'),
     cwDict = prep.cwDict;
 
 var utility = require('./utility-functions.js'),
+    grid = utility.grid,
     fullToMyRight = utility.fullToMyRight,
     fullBelow = utility.fullBelow,
     startOfWord = utility.startOfWord,
@@ -66,6 +67,13 @@ function addWordAcross(cell) {
   var potentialWords = getPotentialWords(currentState);
   console.log(`currentState: ${currentState}`);
   console.log(`potentialWords: ${potentialWords}`);
+  // TODO: try potential words until success
+  // Option A: manage state / potential words for each square,
+  // returning to word lists whenever we have a failure downstream
+  // might employ injected factory for managing state
+  // Option B: recursive solution -- seems appropriate,
+  // but having hard time imagining how it might work
+
 }
 
 function alreadyFilled(cell) {
@@ -89,9 +97,30 @@ function findNextSquare(currentCell) {
   }
   return currentCell;
 }
+
+function drawGrid() {
+  // process.stdout.write('\x1B[2J');
+  for (let row=1; row<=4; row++) {
+    let rowOutput = '';
+    for (let col=1; col<=4; col++) {
+      let contents = grid[`cw-${row}-${col}`];
+      if (contents === 'blank') {
+        rowOutput += '#';
+      } else if (contents === '') {
+        rowOutput += ' ';
+      } else {
+        rowOutput += contents.toUpperCase();
+      }
+      rowOutput += '  ';
+    }
+    console.log(rowOutput);
+  }
+}
+
 var iterations = 0;
 function populate(cell='cw-1-1', success=true) {
   if (!isValidCell(cell)) return success;
+  drawGrid();
   console.log(`populate...`);
   console.log(`cell: ${cell}`);
   console.log(`success: ${success}`);
@@ -101,8 +130,11 @@ function populate(cell='cw-1-1', success=true) {
     addWords(cell);
   }
   // console.log(`findNextSquare for ${cell} returns ${findNextSquare(cell)}`);
-  if (iterations++ < 4)
-    populate(findNextSquare(cell), success);
+  if (iterations++ < 4) {
+    setTimeout(function () {
+      populate(findNextSquare(cell), success);
+    }, 1000);
+  }
 }
 
 var start = function(cell) {

@@ -146,6 +146,7 @@ var grid = fetchGrid();
 
 
 module.exports = {
+  grid,
   fullToMyRight,
   fullBelow,
   startOfWord,

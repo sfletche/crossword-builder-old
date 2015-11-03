@@ -5,7 +5,16 @@ Run Tests: npm test
 What's Next
 remove promise-redis and redis from node_modules and from prep-work and solve-it
 change strategy to in-memory for now
-restart work on solving 4x4 (or 3x3) puzzle
+restarting work on solving 4x4 (or 3x3) puzzle
+for now at least...
+ - manage the state of the grid...this will include the following
+  - manage the words attempted for each answer
+1. find row or col in need of answer
+2. provide answer
+ a. if no answer available
+  i.  revisit previously answered words and advance to next word in list
+  ii. if no answers remain, then revisit previous answer before this answer
+3. repeat
 
 Current Problem...
 Testing Asynchronous code (async/await)
@@ -65,7 +74,7 @@ Persistent storage
 2-2-b: ['ab']
 ...
 
-Dictionary example - deprecated
+Dictionary example - revived (no longer deprecated)
 {
   '2': {
     '1': {
@@ -95,3 +104,13 @@ Dictionary example - deprecated
     }
   }
 }
+
+Sample Algorithm
+
+
+find next start of word
+if no next start of word, then we're done
+populate across
+if fail then how to know which word was the last added and how to know which words had been tried...?
+populate down
+if fail then see problems above...

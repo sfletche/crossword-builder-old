@@ -147,6 +147,8 @@ var grid = fetchGrid();
 
 module.exports = {
   grid,
+  firstCellOfAcross,
+  firstCellOfDown,
   fullToMyRight,
   fullBelow,
   startOfWord,
@@ -155,6 +157,7 @@ module.exports = {
   isEmpty,
   getAdjacentCell,
   getCellToRight,
+  getCellBelow,
   getContents,
   isOrigin,
   isBlankOrWall,

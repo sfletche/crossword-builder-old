@@ -90,7 +90,7 @@ function addWordToGrid(cell, direction, word) {
   if (direction === 'across') {
     for(let i=0; i<word.length; i++) {
       grid[nextCell] = word[i].toUpperCase();
-      nextCell = getCellToRight(cell);
+      nextCell = getCellToRight(nextCell);
     }
   } else {
     for(let i=0; i<word.length; i++) {

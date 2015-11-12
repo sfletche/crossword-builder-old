@@ -1,4 +1,5 @@
 var _ = require('lodash-node');
+var shuffle = require('knuth-shuffle-seeded');
 var prep = require('./prep-work.js'),
     addToDictionary = prep.addToDictionary,
     MAX_WORD_LENGTH = prep.MAX_WORD_LENGTH,
@@ -77,7 +78,7 @@ function getWordLists(state) {
 function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
-  return words;
+  return shuffle(words, 1);
 }
 
 function getDirectionFromKey(key) {

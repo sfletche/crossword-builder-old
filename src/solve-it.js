@@ -34,16 +34,22 @@ var utility = require('./utility-functions.js'),
 
 var inProcess = false;
 
-function addWordDown(cell) {
-  console.log(`addWordDown: ${cell}`);
-}
-
 function getCurrentStateAcross(cell) {
   var cells = [];
   var currentCell = cell;
   while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
-    cells.push(getContents(currentCell));
+    cells.push(getContents(currentCell).toLowerCase());
     currentCell = getCellToRight(currentCell);
+  }
+  return cells;
+}
+
+function getCurrentStateDown(cell) {
+  var cells = [];
+  var currentCell = cell;
+  while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
+    cells.push(getContents(currentCell).toLowerCase());
+    currentCell = getCellBelow(currentCell);
   }
   return cells;
 }
@@ -95,7 +101,7 @@ function addWordToGrid(cell, direction, word) {
   } else {
     for(let i=0; i<word.length; i++) {
       grid[nextCell] = word[i].toUpperCase();
-      nextCell = getC;
+      nextCell = getCellBelow(nextCell);
     }
   }
 }
@@ -123,6 +129,21 @@ function addWordAcross(cell) {
   addWordToGrid(cell, 'across', potentialWords[0]);
 }
 
+function addWordDown(cell) {
+  var currentState = getCurrentStateDown(cell);
+  var potentialWords = getPotentialWords(currentState);
+  console.log(`currentState: ${currentState}`);
+  console.log(`potentialWords: ${potentialWords}`);
+  console.log(cell);
+  var key = `${cell}-down`;
+  potentialAnswers[key] = {
+    wordList: potentialWords,
+    index: 0,
+    getNextWord: function() { return this.wordList[this.index]; }
+  };
+  addWordToGrid(cell, 'down', potentialWords[0]);
+}
+
 function alreadyFilled(cell) {
   return fullToMyRight(cell) && fullBelow(cell);
 }
@@ -130,11 +151,14 @@ function alreadyFilled(cell) {
 function addWords(cell) {
   console.log(`addWords: ${cell}`);
   if (!fullToMyRight(cell)) {
+    console.log('adding word across');
     addWordAcross(cell);
+    drawGrid();
   }
   if (!fullBelow(cell)) {
     console.log('adding word down');
-    // addWordDown(cell);
+    addWordDown(cell);
+    drawGrid();
   }
 }
 
@@ -144,7 +168,7 @@ function findNextSquare(currentCell) {
   //   (firstCellOfDown or firstCellOfAcross) and (fullToMyRight and fullBelow)
   //     return cell
   // console.log(`isBlankOrWall(${currentCell}): ${isBlankOrWall(currentCell)}`);
-  while(true) {
+  while(currentCell) {
     console.log(currentCell);
     if (isBlankOrWall(currentCell)) {
       currentCell = getAdjacentCell(currentCell);
@@ -181,7 +205,7 @@ function drawGrid() {
 var iterations = 0;
 function populate(cell='cw-1-1', success=true) {
   if (!isValidCell(cell)) return success;
-  drawGrid();
+  // drawGrid();
   console.log(`populate...`);
   console.log(`cell: ${cell}`);
   console.log(`success: ${success}`);

@@ -1,7 +1,14 @@
-import '../auto_mock_off';
+// import '../auto_mock_off';
 // import { fullToMyRight } from '../src/solve-it.js';
 
-describe('solve-it', function() {
+describe('getPotentialWords', function() {
+  // var subject = require('../src/solve-it.js');
+  it('returns a list of potential words given a state', function() {
+    expect(true).toEqual(false);
+  });
+});
+
+xdescribe('solve-it', function() {
   var subject = require('../src/solve-it.js');
 
   describe('testAsync', function() {

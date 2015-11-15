@@ -1,3 +1,4 @@
+var _ = require('lodash-node');
 var cwDict = {};
 var MAX_WORD_LENGTH = 4;
 
@@ -20,8 +21,9 @@ function addToDictionary(word) {
 
   for (var i=1; i<=len; i++) {
     cwDict[len][i] = cwDict[len][i] || {};
-    cwDict[len][i][newWord[i-1]] = cwDict[len][i][newWord[i-1]] || new Set();
-    cwDict[len][i][newWord[i-1]].add(newWord);
+    cwDict[len][i][newWord[i-1]] = cwDict[len][i][newWord[i-1]] || [];
+    cwDict[len][i][newWord[i-1]].push(newWord);
+    cwDict[len][i][newWord[i-1]] = _.uniq(cwDict[len][i][newWord[i-1]]);
   }
 }
 

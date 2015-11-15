@@ -1,6 +1,8 @@
 Instructions
 Solve Puzzle: babel-node src/run.js
-Run Tests: npm test
+Run Tests: jasmine-node spec/
+NOTE: Having trouble running jasmine with babel...
+TEMP SOLUTION: creating ad hoc non-jasmine unit tests in test/
 
 What's Next
 remove promise-redis and redis from node_modules and from prep-work and solve-it

@@ -1,4 +1,4 @@
-import '../auto_mock_off';
+// import '../auto_mock_off';
 // import { fullToMyRight } from '../src/solve-it.js';
 
 xdescribe('utility-functions', function() {

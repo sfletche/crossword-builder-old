@@ -4,8 +4,8 @@ const NUM_COLS = 4;
 
 var isValidCell = function(cell) {
   var [cw,row,col] = cell.split('-');
-  return row >= 0 && row <= NUM_ROWS &&
-         col >= 0 && col <= NUM_COLS;
+  return row > 0 && row <= NUM_ROWS &&
+         col > 0 && col <= NUM_COLS;
 };
 
 var getAdjacentCell = function(cell) {
@@ -98,6 +98,20 @@ function firstCellOfAcross(cell) {
   return nothingToMyLeft(cell);
 }
 
+function getTopCellInColumn(cell) {
+  while (!firstCellOfDown(cell)) {
+    cell = getCellAbove(cell);
+  }
+  return cell;
+}
+
+function getLeftMostCellInColumn(cell) {
+  while (!firstCellOfAcross(cell)) {
+    cell = getCellToLeft(cell);
+  }
+  return cell;
+}
+
 function getCellAbove(cell) {
   var [cw,row,col] = cell.split('-');
   return [cw, row-1, col].join('-');
@@ -149,6 +163,8 @@ module.exports = {
   grid,
   firstCellOfAcross,
   firstCellOfDown,
+  getTopCellInColumn,
+  getLeftMostCellInColumn,
   fullToMyRight,
   fullBelow,
   startOfWord,

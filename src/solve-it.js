@@ -5,9 +5,9 @@ var prep = require('./prep-work.js'),
     MAX_WORD_LENGTH = prep.MAX_WORD_LENGTH,
     rd = prep.rd,
     cwDict = prep.cwDict;
-var potentialAnswers = {};
+var answers = {};
 /*
-potentialAnswers = {
+answers = {
   'cw-1-3-down': {
     wordList: ['ha', 'hi', 'he'],
     index: 0
@@ -21,6 +21,8 @@ var utility = require('./utility-functions.js'),
     fullBelow = utility.fullBelow,
     firstCellOfDown = utility.firstCellOfDown,
     firstCellOfAcross = utility.firstCellOfAcross,
+    getTopCellInColumn = utility.getTopCellInColumn,
+    getLeftMostCellInColumn = utility.getLeftMostCellInColumn,
     startOfWord = utility.startOfWord,
     isBlankCell = utility.isBlankCell,
     isEmpty = utility.isEmpty,
@@ -45,31 +47,37 @@ function getCurrentStateAcross(cell) {
   return cells;
 }
 
-function getCurrentStateDown(cell) {
+function getCurrentStateDown(cell, options={}) {
   var cells = [];
   var currentCell = cell;
+  console.log('getCurrentStateDown...');
+  console.log(currentCell);
   while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
-    cells.push(getContents(currentCell).toLowerCase());
+    if (options.cell && options.letter && options.cell === currentCell) {
+      cells.push(options.letter);
+    } else {
+      cells.push(getContents(currentCell).toLowerCase());
+    }
     currentCell = getCellBelow(currentCell);
   }
   return cells;
 }
 
-function compileWordLists(err, data) {
-}
-
-function getWordLists(state) {
+function getWordLists(state, testObj={}) {
+  console.log('getWordLists');
+  // var cwDict = testObj.cwDict || cwDict;
   var wordLists = [];
   for (let i=0, len = state.length; i<len; i++) {
     let letter = state[i];
     if (isLetter(letter)) {
-      wordLists.push(Array.from(cwDict[len][i+1][letter]));
-      // let key = 'cw:' + state.length + ':';
-      // key += (parseInt(i, 10)+1) + ':';
-      // key += state[i];
-      // client.lpop(key)
-      //   .then(console.log)
-      //   .catch(console.log);
+      console.log('get word lists from state: ' + state);
+      // console.log(_.flatten((cwDict[len][i+1][letter])));
+      // console.log(cwDict[2][1]['h']);
+      wordLists.push(_.flatten((cwDict[len][i+1][letter])));
+    } else {
+      console.log('get word lists from non letter state: ' + state);
+      // console.log(_.flatten((_.values(cwDict[len][i+1], function(arr) { return arr } ))));
+      wordLists.push(_.flatten((_.values(cwDict[len][i+1], function(arr) { return arr } ))));
     }
   }
   return wordLists;
@@ -78,7 +86,8 @@ function getWordLists(state) {
 function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
-  return shuffle(words, 1);
+  // return shuffle(words, 5);
+  return shuffle(words);
 }
 
 function getDirectionFromKey(key) {
@@ -107,6 +116,57 @@ function addWordToGrid(cell, direction, word) {
   }
 }
 
+function getVerticalState(cell, letter) {
+  console.log('getVerticalState...');
+  var topCell = getTopCellInColumn(cell);
+  console.log('topCell: ' + topCell);
+  var options = { cell, letter };
+  var state = getCurrentStateDown(topCell, options);
+  console.log('state: ' + state);
+  return state;
+}
+
+function getHorizontalState(cell, letter) {
+  console.log('getHorizontalState...');
+  var leftMostCell = getLeftMostCellInColumn(cell);
+  console.log('leftMostCell: ' + leftMostCell);
+  var options = { cell, letter };
+  var state = getCurrentStateAcross(leftMostCell, options);
+  console.log('state: ' + state);
+  return state;
+}
+
+function isPotentialWord(state) {
+  console.log('potentialWord...');
+  console.log(state);
+  // check length of getPotentialWords
+  console.log('potential words: ', getPotentialWords(state).length);
+  return getPotentialWords(state).length > 0;
+  // return true;
+}
+
+function viableAnswer(cell, direction, word) {
+  var nextCell = cell;
+  console.log('viableAnswer...');
+  console.log(nextCell);
+  if (direction === 'across') {
+    for(let i=0; i<word.length; i++) {
+      if (!isPotentialWord(getVerticalState(nextCell, word[i]))) {
+        return false;
+      }
+      nextCell = getCellToRight(nextCell);
+    }
+  } else {
+    for(let i=0; i<word.length; i++) {
+      if (!isPotentialWord(getHorizontalState(nextCell, word[i]))) {
+        return false;
+      }
+      nextCell = getCellBelow(nextCell);
+    }
+  }
+  return true;
+}
+
 function addWordAcross(cell) {
   var currentState = getCurrentStateAcross(cell);
   var potentialWords = getPotentialWords(currentState);
@@ -121,13 +181,17 @@ function addWordAcross(cell) {
   // Option A
   console.log(cell);
   var key = `${cell}-across`;
-  potentialAnswers[key] = {
+  answers[key] = {
     wordList: potentialWords,
     index: 0,
-    getNextWord: function() { return this.wordList[this.index]; }
+    getCurrentWord: function() { return this.wordList[this.index]; },
+    getNextWord: function() { return this.wordList[++this.index]; }
   };
-  // add potentialAnswers.key.wordList[index] to the grid
-  addWordToGrid(cell, 'across', potentialWords[0]);
+  while (!viableAnswer(cell, 'across', answers[key].getCurrentWord())) {
+    answers[key].getNextWord();
+  }
+  // add answers.key.wordList[index] to the grid
+  addWordToGrid(cell, 'across', answers[key].getCurrentWord());
 }
 
 function addWordDown(cell) {
@@ -137,11 +201,15 @@ function addWordDown(cell) {
   console.log(`potentialWords: ${potentialWords}`);
   console.log(cell);
   var key = `${cell}-down`;
-  potentialAnswers[key] = {
+  answers[key] = {
     wordList: potentialWords,
     index: 0,
-    getNextWord: function() { return this.wordList[this.index]; }
+    getCurrentWord: function() { return this.wordList[this.index]; },
+    getNextWord: function() { return this.wordList[++this.index]; }
   };
+  while (!viableAnswer(cell, 'down', answers[key].getCurrentWord())) {
+    answers[key].getNextWord();
+  }
   addWordToGrid(cell, 'down', potentialWords[0]);
 }
 
@@ -229,10 +297,12 @@ var start = function(cell) {
       addToDictionary(word);
     }
   }).on('close', function() {
+    console.log(cwDict[2][1]['h']);
     populate();
   });
 }
 
 module.exports = {
-  start
+  start,
+  getWordLists
 };

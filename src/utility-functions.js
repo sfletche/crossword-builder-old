@@ -1,6 +1,6 @@
 
-const NUM_ROWS = 4;
-const NUM_COLS = 4;
+const NUM_ROWS = 5;
+const NUM_COLS = 5;
 
 var isValidCell = function(cell) {
   var [cw,row,col] = cell.split('-');
@@ -141,18 +141,27 @@ function fetchGrid() {
     'cw-1-2': 'blank',
     'cw-1-3': 'h',
     'cw-1-4': '',
+    'cw-1-5': '',
     'cw-2-1': 'blank',
     'cw-2-2': '',
     'cw-2-3': 'a',
     'cw-2-4': '',
+    'cw-2-5': '',
     'cw-3-1': '',
     'cw-3-2': '',
-    'cw-3-3': 'd',
-    'cw-3-4': 'blank',
+    'cw-3-3': 'n',
+    'cw-3-4': '',
+    'cw-3-5': '',
     'cw-4-1': '',
     'cw-4-2': '',
-    'cw-4-3': 'blank',
-    'cw-4-4': 'blank',
+    'cw-4-3': 'd',
+    'cw-4-4': '',
+    'cw-4-5': 'blank',
+    'cw-5-1': '',
+    'cw-5-2': '',
+    'cw-5-3': 'y',
+    'cw-5-4': 'blank',
+    'cw-5-5': 'blank'
   }
 }
 

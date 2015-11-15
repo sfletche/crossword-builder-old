@@ -3,8 +3,22 @@ Solve Puzzle: babel-node src/run.js
 Run Tests: jasmine-node spec/
 NOTE: Having trouble running jasmine with babel...
 TEMP SOLUTION: creating ad hoc non-jasmine unit tests in test/
+Debugger: node-inspector...node-debug src/run.js (also not working with ES6..?)
 
-What's Next
+Get Word List
+from the /usr/share/dict/ dir
+egrep -x '\w{2,5}' words > ~/sample.txt
+
+What's Next Now...
+move console.log statements so they can be toggled on/off
+need better way to update the size of the grid
+ocassionally working for 5 letter words (seeds 4-5 work, seeds 1-3 do not)
+
+OF NOTE:
+Plurals not represented in dictionary
+
+
+What was next
 remove promise-redis and redis from node_modules and from prep-work and solve-it
 change strategy to in-memory for now
 restarting work on solving 4x4 (or 3x3) puzzle

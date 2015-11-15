@@ -1,6 +1,6 @@
 var _ = require('lodash-node');
 var cwDict = {};
-var MAX_WORD_LENGTH = 4;
+var MAX_WORD_LENGTH = 5;
 
 var fs = require('fs'),
     gfs = require('graceful-fs'),
@@ -9,7 +9,7 @@ var fs = require('fs'),
 gfs.gracefulify(fs);
 
 var rd = readline.createInterface({
-    input: fs.createReadStream('words.txt'),
+    input: fs.createReadStream('words5.txt'),
     output: process.stdout,
     terminal: false
 });

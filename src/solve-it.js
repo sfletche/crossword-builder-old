@@ -37,11 +37,17 @@ var utility = require('./utility-functions.js'),
 
 var inProcess = false;
 
-function getCurrentStateAcross(cell) {
+function getCurrentStateAcross(cell, options={}) {
   var cells = [];
   var currentCell = cell;
+  console.log('getCurrentStateAcross');
+  console.log(currentCell);
   while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
-    cells.push(getContents(currentCell).toLowerCase());
+    if (options.cell && options.letter && options.cell === currentCell) {
+      cells.push(options.letter);
+    } else {
+      cells.push(getContents(currentCell).toLowerCase());
+    }
     currentCell = getCellToRight(currentCell);
   }
   return cells;
@@ -87,7 +93,7 @@ function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
   // return shuffle(words, 5);
-  return shuffle(words);
+  return shuffle(words, 5);
 }
 
 function getDirectionFromKey(key) {
@@ -128,6 +134,8 @@ function getVerticalState(cell, letter) {
 
 function getHorizontalState(cell, letter) {
   console.log('getHorizontalState...');
+  console.log(cell);
+  console.log(letter);
   var leftMostCell = getLeftMostCellInColumn(cell);
   console.log('leftMostCell: ' + leftMostCell);
   var options = { cell, letter };
@@ -168,6 +176,7 @@ function viableAnswer(cell, direction, word) {
 }
 
 function addWordAcross(cell) {
+  console.log('addWordAcross...');
   var currentState = getCurrentStateAcross(cell);
   var potentialWords = getPotentialWords(currentState);
   console.log(`currentState: ${currentState}`);
@@ -195,6 +204,7 @@ function addWordAcross(cell) {
 }
 
 function addWordDown(cell) {
+  console.log('addWordDown...');
   var currentState = getCurrentStateDown(cell);
   var potentialWords = getPotentialWords(currentState);
   console.log(`currentState: ${currentState}`);
@@ -210,7 +220,7 @@ function addWordDown(cell) {
   while (!viableAnswer(cell, 'down', answers[key].getCurrentWord())) {
     answers[key].getNextWord();
   }
-  addWordToGrid(cell, 'down', potentialWords[0]);
+  addWordToGrid(cell, 'down', answers[key].getCurrentWord());
 }
 
 function alreadyFilled(cell) {
@@ -254,9 +264,9 @@ function findNextSquare(currentCell) {
 
 function drawGrid() {
   // process.stdout.write('\x1B[2J');
-  for (let row=1; row<=4; row++) {
+  for (let row=1; row<=5; row++) {
     let rowOutput = '';
-    for (let col=1; col<=4; col++) {
+    for (let col=1; col<=5; col++) {
       let contents = grid[`cw-${row}-${col}`];
       if (contents === 'blank') {
         rowOutput += '#';
@@ -284,10 +294,10 @@ function populate(cell='cw-1-1', success=true) {
     addWords(cell);
   }
   // console.log(`findNextSquare for ${cell} returns ${findNextSquare(cell)}`);
-  if (iterations++ < 4) {
-    setTimeout(function () {
+  if (iterations++ < 5) {
+    // setTimeout(function () {
       populate(findNextSquare(cell), success);
-    }, 500);
+    // }, 500);
   }
 }
 

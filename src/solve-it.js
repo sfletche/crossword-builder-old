@@ -16,6 +16,7 @@ answers = {
 */
 
 var utility = require('./utility-functions.js'),
+    log = utility.log,
     grid = utility.grid,
     fullToMyRight = utility.fullToMyRight,
     fullBelow = utility.fullBelow,
@@ -40,8 +41,8 @@ var inProcess = false;
 function getCurrentStateAcross(cell, options={}) {
   var cells = [];
   var currentCell = cell;
-  console.log('getCurrentStateAcross');
-  console.log(currentCell);
+  log('getCurrentStateAcross', 3);
+  log(currentCell, 3);
   while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
     if (options.cell && options.letter && options.cell === currentCell) {
       cells.push(options.letter);
@@ -56,8 +57,8 @@ function getCurrentStateAcross(cell, options={}) {
 function getCurrentStateDown(cell, options={}) {
   var cells = [];
   var currentCell = cell;
-  console.log('getCurrentStateDown...');
-  console.log(currentCell);
+  log('getCurrentStateDown...', 3);
+  log(currentCell, 3);
   while(isValidCell(currentCell) && !isBlankCell(currentCell)) {
     if (options.cell && options.letter && options.cell === currentCell) {
       cells.push(options.letter);
@@ -70,19 +71,19 @@ function getCurrentStateDown(cell, options={}) {
 }
 
 function getWordLists(state, testObj={}) {
-  console.log('getWordLists');
+  log('getWordLists', 3);
   // var cwDict = testObj.cwDict || cwDict;
   var wordLists = [];
   for (let i=0, len = state.length; i<len; i++) {
     let letter = state[i];
     if (isLetter(letter)) {
-      console.log('get word lists from state: ' + state);
-      // console.log(_.flatten((cwDict[len][i+1][letter])));
-      // console.log(cwDict[2][1]['h']);
+      log('get word lists from state: ' + state, 3);
+      // log(_.flatten((cwDict[len][i+1][letter])), 3);
+      // log(cwDict[2][1]['h'], 3);
       wordLists.push(_.flatten((cwDict[len][i+1][letter])));
     } else {
-      console.log('get word lists from non letter state: ' + state);
-      // console.log(_.flatten((_.values(cwDict[len][i+1], function(arr) { return arr } ))));
+      log('get word lists from non letter state: ' + state, 3);
+      // log(_.flatten((_.values(cwDict[len][i+1], function(arr) { return arr } ))), 3);
       wordLists.push(_.flatten((_.values(cwDict[len][i+1], function(arr) { return arr } ))));
     }
   }
@@ -93,7 +94,7 @@ function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
   // return shuffle(words, 5);
-  return shuffle(words, 5);
+  return shuffle(words, 3);
 }
 
 function getDirectionFromKey(key) {
@@ -105,16 +106,18 @@ function getDirectionFromKey(key) {
 }
 
 function addWordToGrid(cell, direction, word) {
-  console.log('next word: ' + word);
-  console.log('cell: ' + cell);
-  console.log('direction: ' + direction);
+  log('next word: ' + word, 3);
+  log('cell: ' + cell, 3);
+  log('direction: ' + direction, 3);
   var nextCell = cell;
   if (direction === 'across') {
+    log('this for loop?');
     for(let i=0; i<word.length; i++) {
       grid[nextCell] = word[i].toUpperCase();
       nextCell = getCellToRight(nextCell);
     }
   } else {
+    log('or this for loop?');
     for(let i=0; i<word.length; i++) {
       grid[nextCell] = word[i].toUpperCase();
       nextCell = getCellBelow(nextCell);
@@ -123,41 +126,42 @@ function addWordToGrid(cell, direction, word) {
 }
 
 function getVerticalState(cell, letter) {
-  console.log('getVerticalState...');
+  log('getVerticalState...', 3);
   var topCell = getTopCellInColumn(cell);
-  console.log('topCell: ' + topCell);
+  log('topCell: ' + topCell, 3);
   var options = { cell, letter };
   var state = getCurrentStateDown(topCell, options);
-  console.log('state: ' + state);
+  log('state: ' + state, 3);
   return state;
 }
 
 function getHorizontalState(cell, letter) {
-  console.log('getHorizontalState...');
-  console.log(cell);
-  console.log(letter);
+  log('getHorizontalState...', 3);
+  log(cell, 3);
+  log(letter, 3);
   var leftMostCell = getLeftMostCellInColumn(cell);
-  console.log('leftMostCell: ' + leftMostCell);
+  log('leftMostCell: ' + leftMostCell, 3);
   var options = { cell, letter };
   var state = getCurrentStateAcross(leftMostCell, options);
-  console.log('state: ' + state);
+  log('state: ' + state, 3);
   return state;
 }
 
 function isPotentialWord(state) {
-  console.log('potentialWord...');
-  console.log(state);
+  log('potentialWord...', 3);
+  log(state, 3);
   // check length of getPotentialWords
-  console.log('potential words: ', getPotentialWords(state).length);
+  log('potential words: ' + getPotentialWords(state).length, 3);
   return getPotentialWords(state).length > 0;
   // return true;
 }
 
 function viableAnswer(cell, direction, word) {
   var nextCell = cell;
-  console.log('viableAnswer...');
-  console.log(nextCell);
+  log('viableAnswer...', 3);
+  log(nextCell, 3);
   if (direction === 'across') {
+    log('viable answer across');
     for(let i=0; i<word.length; i++) {
       if (!isPotentialWord(getVerticalState(nextCell, word[i]))) {
         return false;
@@ -165,6 +169,8 @@ function viableAnswer(cell, direction, word) {
       nextCell = getCellToRight(nextCell);
     }
   } else {
+    log('viable answer down');
+    log(word);
     for(let i=0; i<word.length; i++) {
       if (!isPotentialWord(getHorizontalState(nextCell, word[i]))) {
         return false;
@@ -176,11 +182,11 @@ function viableAnswer(cell, direction, word) {
 }
 
 function addWordAcross(cell) {
-  console.log('addWordAcross...');
+  log('addWordAcross...', 3);
   var currentState = getCurrentStateAcross(cell);
   var potentialWords = getPotentialWords(currentState);
-  console.log(`currentState: ${currentState}`);
-  console.log(`potentialWords: ${potentialWords}`);
+  log(`currentState: ${currentState}`, 3);
+  log(`potentialWords: ${potentialWords}`, 3);
   // TODO: try potential words until success
   // Option A: manage state / potential words for each square,
   // returning to word lists whenever we have a failure downstream
@@ -188,7 +194,7 @@ function addWordAcross(cell) {
   // Option B: recursive solution -- seems appropriate,
   // but having hard time imagining how it might work
   // Option A
-  console.log(cell);
+  log(cell, 3);
   var key = `${cell}-across`;
   answers[key] = {
     wordList: potentialWords,
@@ -204,12 +210,12 @@ function addWordAcross(cell) {
 }
 
 function addWordDown(cell) {
-  console.log('addWordDown...');
+  log('addWordDown...', 3);
   var currentState = getCurrentStateDown(cell);
   var potentialWords = getPotentialWords(currentState);
-  console.log(`currentState: ${currentState}`);
-  console.log(`potentialWords: ${potentialWords}`);
-  console.log(cell);
+  log(`currentState: ${currentState}`, 3);
+  log(`potentialWords: ${potentialWords}`, 3);
+  log(cell, 3);
   var key = `${cell}-down`;
   answers[key] = {
     wordList: potentialWords,
@@ -217,6 +223,7 @@ function addWordDown(cell) {
     getCurrentWord: function() { return this.wordList[this.index]; },
     getNextWord: function() { return this.wordList[++this.index]; }
   };
+  log(answers[key].wordList);
   while (!viableAnswer(cell, 'down', answers[key].getCurrentWord())) {
     answers[key].getNextWord();
   }
@@ -228,14 +235,14 @@ function alreadyFilled(cell) {
 }
 
 function addWords(cell) {
-  console.log(`addWords: ${cell}`);
+  log(`addWords: ${cell}`, 3);
   if (!fullToMyRight(cell)) {
-    console.log('adding word across');
+    log('adding word across', 3);
     addWordAcross(cell);
     drawGrid();
   }
   if (!fullBelow(cell)) {
-    console.log('adding word down');
+    log('adding word down', 3);
     addWordDown(cell);
     drawGrid();
   }
@@ -246,9 +253,9 @@ function findNextSquare(currentCell) {
   //   is this the beginning of an unfinished word (across or down)?
   //   (firstCellOfDown or firstCellOfAcross) and (fullToMyRight and fullBelow)
   //     return cell
-  // console.log(`isBlankOrWall(${currentCell}): ${isBlankOrWall(currentCell)}`);
+  // log(`isBlankOrWall(${currentCell}): ${isBlankOrWall(currentCell)}`, 3);
   while(currentCell) {
-    console.log(currentCell);
+    log(currentCell, 3);
     if (isBlankOrWall(currentCell)) {
       currentCell = getAdjacentCell(currentCell);
     } else if (firstCellOfAcross(currentCell) && !fullToMyRight(currentCell)) {
@@ -259,7 +266,7 @@ function findNextSquare(currentCell) {
       currentCell = getAdjacentCell(currentCell);
     }
   }
-  console.log('NO CELLS FOUND');
+  log('NO CELLS FOUND', 3);
 }
 
 function drawGrid() {
@@ -277,7 +284,7 @@ function drawGrid() {
       }
       rowOutput += '  ';
     }
-    console.log(rowOutput);
+    log(rowOutput, 1);
   }
 }
 
@@ -285,15 +292,15 @@ var iterations = 0;
 function populate(cell='cw-1-1', success=true) {
   if (!isValidCell(cell)) return success;
   // drawGrid();
-  console.log(`populate...`);
-  console.log(`cell: ${cell}`);
-  console.log(`success: ${success}`);
-  console.log(`startOfWord: ${startOfWord(cell)}`);
+  log(`populate...`, 3);
+  log(`cell: ${cell}`, 3);
+  log(`success: ${success}`, 3);
+  log(`startOfWord: ${startOfWord(cell)}`, 3);
   if (startOfWord(cell)) {
-    console.log(`calling addWords with ${cell}`);
+    log(`calling addWords with ${cell}`, 3);
     addWords(cell);
   }
-  // console.log(`findNextSquare for ${cell} returns ${findNextSquare(cell)}`);
+  // log(`findNextSquare for ${cell} returns ${findNextSquare(cell)}`, 3);
   if (iterations++ < 5) {
     // setTimeout(function () {
       populate(findNextSquare(cell), success);
@@ -307,7 +314,7 @@ var start = function(cell) {
       addToDictionary(word);
     }
   }).on('close', function() {
-    console.log(cwDict[2][1]['h']);
+    log(cwDict[2][1]['h'], 3);
     populate();
   });
 }

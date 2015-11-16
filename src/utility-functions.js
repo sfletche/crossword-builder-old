@@ -1,6 +1,13 @@
 
 const NUM_ROWS = 5;
 const NUM_COLS = 5;
+const LOGGING_PRIORITY = 2;
+
+var log = function(content, priority=1) {
+  if (priority <= LOGGING_PRIORITY) {
+    console.log(content);
+  }
+}
 
 var isValidCell = function(cell) {
   var [cw,row,col] = cell.split('-');
@@ -170,6 +177,7 @@ var grid = fetchGrid();
 
 module.exports = {
   grid,
+  log,
   firstCellOfAcross,
   firstCellOfDown,
   getTopCellInColumn,

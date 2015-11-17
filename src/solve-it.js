@@ -5,14 +5,17 @@ var prep = require('./prep-work.js'),
     MAX_WORD_LENGTH = prep.MAX_WORD_LENGTH,
     rd = prep.rd,
     cwDict = prep.cwDict;
-var answers = {};
+var answers = [];
 /*
-answers = {
-  'cw-1-3-down': {
-    wordList: ['ha', 'hi', 'he'],
-    index: 0
-  }
-}
+answers = [
+  {
+    'cw-1-3-down': {
+      wordList: ['ha', 'hi', 'he'],
+      index: 0
+    }
+  },
+  ...
+]
 */
 
 var utility = require('./utility-functions.js'),
@@ -196,17 +199,21 @@ function addWordAcross(cell) {
   // Option A
   log(cell, 3);
   var key = `${cell}-across`;
-  answers[key] = {
-    wordList: potentialWords,
+  var answer = {};
+  answer[key] = {
+    cell: cell,
+    currentState: currentState,
     index: 0,
+    wordList: potentialWords,
     getCurrentWord: function() { return this.wordList[this.index]; },
     getNextWord: function() { return this.wordList[++this.index]; }
   };
-  while (!viableAnswer(cell, 'across', answers[key].getCurrentWord())) {
-    answers[key].getNextWord();
+  while (!viableAnswer(cell, 'across', answer[key].getCurrentWord())) {
+    answer[key].getNextWord();
   }
   // add answers.key.wordList[index] to the grid
-  addWordToGrid(cell, 'across', answers[key].getCurrentWord());
+  answers.push(answer);
+  addWordToGrid(cell, 'across', answer[key].getCurrentWord());
 }
 
 function addWordDown(cell) {
@@ -217,17 +224,28 @@ function addWordDown(cell) {
   log(`potentialWords: ${potentialWords}`, 3);
   log(cell, 3);
   var key = `${cell}-down`;
-  answers[key] = {
-    wordList: potentialWords,
+  var answer = {};
+  answer[key] = {
+    cell: cell,
+    currentState: currentState,
     index: 0,
+    wordList: potentialWords,
     getCurrentWord: function() { return this.wordList[this.index]; },
     getNextWord: function() { return this.wordList[++this.index]; }
   };
-  log(answers[key].wordList);
-  while (!viableAnswer(cell, 'down', answers[key].getCurrentWord())) {
-    answers[key].getNextWord();
+  log(answer[key].wordList);
+  var word = answer[key].getCurrentWord();
+  while (word && !viableAnswer(cell, 'down', word)) {
+    word = answer[key].getNextWord();
   }
-  addWordToGrid(cell, 'down', answers[key].getCurrentWord());
+  // If currentWord exists, then add word to grid
+  // Otherwise, back up
+  if (word) {
+    answers.push(answer);
+    addWordToGrid(cell, 'down', word);
+    return true;
+  }
+  return false;
 }
 
 function alreadyFilled(cell) {
@@ -243,9 +261,12 @@ function addWords(cell) {
   }
   if (!fullBelow(cell)) {
     log('adding word down', 3);
-    addWordDown(cell);
+    if (!addWordDown(cell)) {
+      return false;
+    }
     drawGrid();
   }
+  return true;
 }
 
 function findNextSquare(currentCell) {
@@ -298,7 +319,21 @@ function populate(cell='cw-1-1', success=true) {
   log(`startOfWord: ${startOfWord(cell)}`, 3);
   if (startOfWord(cell)) {
     log(`calling addWords with ${cell}`, 3);
-    addWords(cell);
+    var successfulAdd = addWords(cell);
+    if (!successfulAdd) {
+      // back up
+      console.log('BACK UP');
+      drawGrid();
+      console.log(answers);
+      // TODO
+      // how to back up...?
+      // how to know which cells to delete?
+      // ...
+      // look at previous entry in answers
+      // each answer should keep track of which cells it populated
+      // remove previous entry after clearing letters
+      // move pointer on previous entry
+    }
   }
   // log(`findNextSquare for ${cell} returns ${findNextSquare(cell)}`, 3);
   if (iterations++ < 5) {

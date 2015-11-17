@@ -10,7 +10,8 @@ from the /usr/share/dict/ dir
 egrep -x '\w{2,5}' words > ~/sample.txt
 
 What's Next Now...
-move console.log statements so they can be toggled on/off
+change `answers` to an array to preserve ordering
+  this will come in handy when we need to backtrace after deadend
 need better way to update the size of the grid
 ocassionally working for 5 letter words (seeds 4-5 work, seeds 1-3 do not)
 

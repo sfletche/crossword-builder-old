@@ -100,7 +100,7 @@ function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
   // return shuffle(words, 5);
-  return shuffle(words, 3);
+  return shuffle(words, 6);
 }
 
 function addWordToGrid(cell, direction, word) {
@@ -109,13 +109,11 @@ function addWordToGrid(cell, direction, word) {
   log('direction: ' + direction, 3);
   var nextCell = cell;
   if (direction === 'across') {
-    log('this for loop?');
     for(let i=0; i<word.length; i++) {
       grid[nextCell] = word[i].toUpperCase();
       nextCell = getCellToRight(nextCell);
     }
   } else {
-    log('or this for loop?');
     for(let i=0; i<word.length; i++) {
       grid[nextCell] = word[i].toUpperCase();
       nextCell = getCellBelow(nextCell);
@@ -202,11 +200,16 @@ function addWordAcross(cell) {
     getCurrentWord: function() { return this.wordList[this.index]; },
     getNextWord: function() { return this.wordList[++this.index]; }
   };
-  while (!viableAnswer(cell, 'across', answer.getCurrentWord())) {
-    answer.getNextWord();
+  var word = answer.getCurrentWord();
+  while (word && !viableAnswer(cell, 'across', word)) {
+    word = answer.getNextWord();
   }
-  answers.push(answer);
-  addWordToGrid(cell, 'across', answer.getCurrentWord());
+  if (word) {
+    answers.push(answer);
+    addWordToGrid(cell, 'across', word);
+    return true;
+  }
+  return false;
 }
 
 function addWordDown(cell) {
@@ -323,19 +326,14 @@ function restoreGridState(cell, direction, state) {
   }
 }
 
-function removeLastAnswerFromGrid(answers) {
-  var answer = answers[answers.length-1];
+function removeAnswerFromGrid(answer) {
   restoreGridState(answer.cell, answer.direction, answer.currentState);
-  answer.getNextWord();
-  addWordToGrid(answer.cell, answer.direction, answer.getCurrentWord());
 }
 
 function populate(cell='cw-1-1') {
-  var backingUp, iterations = 1;
-  while(iterations <= 7) {
-    backingUp = false;
-
-    if (!isValidCell(cell)) return;
+  var iterations = 1;
+  while(isValidCell(cell)) {
+    var backingUp = false;
 
     // drawGrid();
     log(`populate...`, 3);
@@ -348,7 +346,12 @@ function populate(cell='cw-1-1') {
         // back up
         console.log('BACKING UP FROM...');
         drawGrid();
-        console.log(answers[answers.length-1]);
+        var answer = answers[answers.length-1];
+        console.log(answer.cell);
+        console.log(answer.currentState);
+        console.log(answer.direction);
+        console.log(answer.index);
+        console.log(answer.wordList.length);
 
         // TODO
         // look at previous entry in answers
@@ -356,8 +359,17 @@ function populate(cell='cw-1-1') {
 
         // remove last answer from grid
         // and advance to next word in wordList
-        removeLastAnswerFromGrid(answers);
-        console.log(answers[answers.length-1]);
+        console.log('removeLastAnswerFromGrid');
+        removeAnswerFromGrid(answer);
+
+        var word = answer.getNextWord();
+        while (!word) {
+          answers.length = answers.length-1; // remove last element
+          answer = answers[answers.length-1];
+          removeAnswerFromGrid(answer);
+          word = answer.getNextWord();
+        }
+        addWordToGrid(answer.cell, answer.direction, word);
 
         // assign local var cell to previous answer cell
         // (in preparation for findNextSquare call below)
@@ -380,6 +392,8 @@ function populate(cell='cw-1-1') {
     }
     iterations++;
   }
+  console.log('iterations: ' + iterations);
+  console.log('cell: ' + cell);
 }
 
 var start = function(cell) {

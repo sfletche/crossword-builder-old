@@ -1,15 +1,16 @@
 
 const NUM_ROWS = 5;
 const NUM_COLS = 5;
-const LOGGING_PRIORITY = 2;
+const LOGGING_PRIORITY = 1;
 
-var log = function(content, priority=1) {
+var log = function(content, priority=2) {
   if (priority <= LOGGING_PRIORITY) {
     console.log(content);
   }
 }
 
 var isValidCell = function(cell) {
+  if (!cell) return false;
   var [cw,row,col] = cell.split('-');
   return row > 0 && row <= NUM_ROWS &&
          col > 0 && col <= NUM_COLS;

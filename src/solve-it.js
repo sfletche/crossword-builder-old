@@ -100,7 +100,8 @@ function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
   // return shuffle(words, 5);
-  return shuffle(words, 6);
+  // currently fails with HANDY as 1 down (cw-1-3) and seed as 6
+  return shuffle(words, 7);
 }
 
 function addWordToGrid(cell, direction, word) {
@@ -332,7 +333,7 @@ function removeAnswerFromGrid(answer) {
 
 function populate(cell='cw-1-1') {
   var iterations = 1;
-  while(isValidCell(cell)) {
+  while(iterations++ < 10 && isValidCell(cell)) {
     var backingUp = false;
 
     // drawGrid();
@@ -390,7 +391,6 @@ function populate(cell='cw-1-1') {
     if (!backingUp) {
       cell = findNextSquare(cell);
     }
-    iterations++;
   }
   console.log('iterations: ' + iterations);
   console.log('cell: ' + cell);

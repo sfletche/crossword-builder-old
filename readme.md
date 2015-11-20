@@ -9,11 +9,21 @@ Get Word List
 from the /usr/share/dict/ dir
 egrep -x '\w{2,5}' words > ~/sample.txt
 
+NEXT
+recreate words4.txt
+generate wordsx.json files
+read json files into dictionary (rather than create dictionary from *.txt)
+
 What's Next Now...
-change `answers` to an array to preserve ordering
-  this will come in handy when we need to backtrace after deadend
+good time to regroup...
+- refactor?
+- connect front-end with back-end?
+- pre-populate json files with word dictionaries
 need better way to update the size of the grid
-ocassionally working for 5 letter words (seeds 4-5 work, seeds 1-3 do not)
+found good failing case to explore with cornered 5x5 grid
+- HANDY / HANDY
+- iterations at 10
+- seed at 7
 
 OF NOTE:
 Plurals not represented in dictionary

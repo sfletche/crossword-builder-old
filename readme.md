@@ -7,18 +7,14 @@ Debugger: node-inspector...node-debug src/run.js (also not working with ES6..?)
 
 Get Word List
 from the /usr/share/dict/ dir
-egrep -x '\w{2,5}' words > ~/sample.txt
+egrep -x '\w{2,5}' words > ~/dev/crossword-builder/word_lists/words5.txt
+Build JSON dictionary from txt file
+babel-node src/create-json.js
 
-NEXT
-recreate words4.txt
-generate wordsx.json files
-read json files into dictionary (rather than create dictionary from *.txt)
-
-What's Next Now...
+WHAT'S NEXT
 good time to regroup...
 - refactor?
 - connect front-end with back-end?
-- pre-populate json files with word dictionaries
 need better way to update the size of the grid
 found good failing case to explore with cornered 5x5 grid
 - HANDY / HANDY
@@ -65,10 +61,6 @@ Auto-fill
    - try word from list of potential words
     - verify all new words created by entry are legit
     - if not, try next word in the list
-
-NOTE: how to simulate a more random / less alphabetical result...?
- - solution 1: randomize the elements of each file after dictionary has been build out
- - solution 2: randomize the elements of potential words once that list is determined
 
 Notepad to manage theme words
  - gray out when entered into grid?

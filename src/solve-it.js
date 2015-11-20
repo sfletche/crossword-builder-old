@@ -1,11 +1,7 @@
 var _ = require('lodash-node');
 var shuffle = require('knuth-shuffle-seeded');
-var prep = require('./prep-work.js'),
-    addToDictionary = prep.addToDictionary,
-    MAX_WORD_LENGTH = prep.MAX_WORD_LENGTH,
-    rd = prep.rd,
-    cwDict = prep.cwDict;
 var answers = [];
+var cwDict = {};
 /*
 answers = [
   {
@@ -88,7 +84,7 @@ function getWordLists(state, testObj={}) {
 function getPotentialWords(state) {
   var wordLists = getWordLists(state);
   var words = _.intersection(...wordLists);
-  return shuffle(words, 7);
+  return shuffle(words);
 }
 
 function addWordToGrid(cell, direction, word) {
@@ -242,6 +238,7 @@ function drawGrid() {
     }
     console.log(rowOutput);
   }
+  console.log();
 }
 
 function restoreStateDown(cell, state) {
@@ -315,11 +312,13 @@ function populate(cell='cw-1-1') {
 }
 
 var start = function(cell) {
-  rd.on('line', function(word) {
-    if (word.length > 1 && word.length <= MAX_WORD_LENGTH) {
-      addToDictionary(word);
-    }
-  }).on('close', function() {
+  var jsonfile = require('jsonfile');
+  var readline = require('readline');
+  var util = require('util');
+
+  var file = 'word_lists/words5.json';
+  jsonfile.readFile(file, function(err, obj) {
+    cwDict = obj;
     populate();
   });
 }
